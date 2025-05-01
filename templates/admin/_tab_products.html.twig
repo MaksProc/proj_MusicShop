@@ -1,0 +1,40 @@
+<div class="container">
+    <h1>Manage Products</h1>
+  
+    <button class="btn btn-primary mb-3" id="add-product-btn">Add New Product</button>
+  
+    <!-- Product Table -->
+    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+      <table class="table table-hover" id="product-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th>Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+            <tr class="product-row"
+                data-id="{{ product.id }}"
+                data-name="{{ product.name }}"
+                data-type="{{ product.type.value }}"
+                {# "Type" here is an enum, will get serialization error without .value #}
+                data-price="{{ product.basePrice }}"
+                data-available="{{ product.stock }}">
+              <td>{{ product.name }}</td>
+              <td>{{ product.type.value }}</td>
+              <td>{{ product.basePrice }}</td>
+              <td>{{ product.stock }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- Dynamic Form Area -->
+    <div id="product-form-container" class="mt-4"></div>
+    </div>
+  
+  <script src="{{ asset('js/admin_dashboard.js') }}"></script>

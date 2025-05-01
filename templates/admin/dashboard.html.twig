@@ -6,22 +6,22 @@
     <!-- Sidebar with tabs -->
     <div class="col-md-2">
       <ul class="nav flex-column nav-pills">
-        <li class="nav-item"><a class="nav-link active" href="#add" data-bs-toggle="tab">Add Product</a></li>
-        <li class="nav-item"><a class="nav-link" href="#delete" data-bs-toggle="tab">Delete Product</a></li>
-        <li class="nav-item"><a class="nav-link" href="#logs" data-bs-toggle="tab">View Logs</a></li>
+        <li class="nav-item"><a class="nav-link active" href="#products" data-bs-toggle="tab">Produkty</a></li>
+        <li class="nav-item"><a class="nav-link" href="#rentals" data-bs-toggle="tab">Wypożyczenia</a></li>
+        <li class="nav-item"><a class="nav-link" href="#users" data-bs-toggle="tab">Użytkownicy</a></li>
       </ul>
     </div>
 
     <!-- Tab content -->
     <div class="col-md-10">
       <div class="tab-content">
-        <div class="tab-pane fade show active" id="add">
-          {% include 'admin/_tab_add_product.html.twig' %}
+        <div class="tab-pane fade show active" id="products">
+          {% include 'admin/_tab_products.html.twig' with {'products': products} %}
         </div>
-        <div class="tab-pane fade" id="delete">
+        <div class="tab-pane fade" id="rentals">
           {% include 'admin/_tab_delete_product.html.twig' %}
         </div>
-        <div class="tab-pane fade" id="logs">
+        <div class="tab-pane fade" id="users">
           {% include 'admin/_tab_view_logs.html.twig' %}
         </div>
       </div>

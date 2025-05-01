@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Form\AddProductForm;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Dom\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,31 +17,31 @@ use Symfony\Flex\Response as FlexResponse;
 
 #[IsGranted('ROLE_ADMIN')]
 class AdminController extends AbstractController {
-    #[Route('/admin', name:'admin_dashboard')]
-    public function admin_dashboard(): Response
-    {
-        return $this->render('admin/dashboard.html.twig');
-    }
 
-    #[Route('/admin/product/new', name: 'admin_product_new')]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    #[Route('/admin', name: 'admin_dashboard')]
+    public function dashboard(ProductRepository $productRepo): Response
     {   
-        $product = new Product();
-        $form = $this->createForm(AddProductForm::class, $product);
-        $form->handleRequest($request);
+        // $product = new Product();
+        // $form = $this->createForm(AddProductForm::class, $product);
+        
+        // $form->handleRequest($request);
+        // if ($form->isSubmitted() && $form->isValid()) {
+        //     $em->persist($product);
+        //     $em->flush();
+        //     $this->addFlash('success', 'Product created!');
+        //     return $this->redirectToRoute('admin_dashboard');
+        // }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($product);
-            $em->flush();
+        // return $this->render('admin/dashboard.html.twig', [
+        //     'form' => $form->createView()
+        // ]);
 
-            $this->addFlash('success', 'Product created!');
-            return $this->redirectToRoute('admin_dashboard');
-        }
-
-        return $this->render('admin/product_new.html.twig', [
-            'form' => $form->createView()
+        $products = $productRepo->findAll();
+        return $this->render('admin/dashboard.html.twig', [
+            'products' => $products
         ]);
     }
+
 
     #[Route('/admin/product/{id}/delete', name: 'admin_product_delete', methods: ['POST'])]
     public function delete(Product $product, EntityManagerInterface $em)
@@ -50,5 +51,69 @@ class AdminController extends AbstractController {
 
         $this->addFlash('success', 'Product deleted!');
         return $this->redirectToRoute('admin_dashboard');
+    }
+
+    #[Route(path: '/admin/product-form/{id}', name: 'admin_product_form', defaults: ['id' => null])]
+    public function productForm(?int $id, ProductRepository $repo, Request $request): Response
+    {
+        $product = $id ? $repo->find($id) : new Product();
+
+        // I am using the same form for creating and updating products from dashboard.
+        // Note to self: refactor AddProductForm to reflect this
+
+        $form = $this->createForm(AddProductForm::class, $product, [
+            'action' => $id ? 
+                $this->generateUrl('admin_product_update', ['id'=> $id]) :
+                $this->generateUrl('admin_product_create'),
+                // Этих двух рутов выше пока что не существует. 
+            'method' => 'POST'
+        ]);
+
+        return $this->render('admin/_product_form.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route(path:'/admin/product/{id}/update', name:'admin_product_update', methods: ['POST'])]
+    public function update(int $id, EntityManagerInterface $em, Request $request, ProductRepository $repo): Response
+    {
+        $product = $repo->find($id);
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+
+        $form = $this->createForm(AddProductForm::class, $product);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+
+            $this->addFlash('success','Product updated');
+            return $this->redirectToRoute('admin_dashboard');
+        }
+
+        return $this->render('admin/_product_form.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
+    #[Route(path:'/admin/product/create', name:'admin_product_create', methods: ['POST'])]
+    public function create(Request $request, EntityManagerInterface $em): Response
+    {
+        $product = new Product();
+        $form = $this->createForm(AddProductForm::class, $product);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($product);
+            $em->flush();
+
+            $this->addFlash('success','Product created');
+            return $this->redirectToRoute('admin_dashboard');
+        }
+
+        return $this->render('admin/_product_form.html.twig', [
+            'form' => $form->createView()
+        ]);
     }
 }

@@ -1,0 +1,6 @@
+<h4>{{ form.vars.value.id ? 'Edit Product' : 'Add New Product' }}</h4>
+
+{{ form_start(form) }}
+  {{ form_widget(form) }}
+  <button class="btn btn-success mt-3">Save</button>
+{{ form_end(form) }}
