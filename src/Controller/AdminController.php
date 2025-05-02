@@ -19,26 +19,16 @@ use Symfony\Flex\Response as FlexResponse;
 class AdminController extends AbstractController {
 
     #[Route('/admin', name: 'admin_dashboard')]
-    public function dashboard(ProductRepository $productRepo): Response
+    public function dashboard(ProductRepository $productRepo, Request $request): Response
     {   
-        // $product = new Product();
-        // $form = $this->createForm(AddProductForm::class, $product);
-        
-        // $form->handleRequest($request);
-        // if ($form->isSubmitted() && $form->isValid()) {
-        //     $em->persist($product);
-        //     $em->flush();
-        //     $this->addFlash('success', 'Product created!');
-        //     return $this->redirectToRoute('admin_dashboard');
-        // }
-
-        // return $this->render('admin/dashboard.html.twig', [
-        //     'form' => $form->createView()
-        // ]);
-
-        $products = $productRepo->findAll();
+        $searchTermProduct = $request->query->get("p");
+        // "p" is for products tab; other tabs might also have searchbars, they will use different keywords
+        $products = $searchTermProduct
+            ? $productRepo->findByNameLike($searchTermProduct)
+            : $productRepo->findAll();
         return $this->render('admin/dashboard.html.twig', [
-            'products' => $products
+            'products' => $products,
+            'p' => $searchTermProduct
         ]);
     }
 

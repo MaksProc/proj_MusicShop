@@ -1,9 +1,14 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/searchbar.css') }}">
+{% endblock %}
+
 {% block body %}
   <div class="container">
-    <form method="get" class="mb-4">
-      <input type="text" name="search" placeholder="Search..." class="form-control" />
+    <form method="get" class="mb-4 position-relative">
+      <input type="text" name="search" value="{{ search|default('') }}" placeholder="Wyszukaj..." class="form-control" />
+      <button type="submit" class="btn btn-search"><i class="fas fa-search search-icon"></i></button>
       {# You can pass category ID or name if categories are used later #}
     </form>
 

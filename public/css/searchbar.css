@@ -1,0 +1,12 @@
+.btn-search {
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    transition: color 0.3s ease;
+}
+.btn-search:hover {
+    color: #007bff;
+}
