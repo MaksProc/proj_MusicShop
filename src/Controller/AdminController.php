@@ -55,7 +55,6 @@ class AdminController extends AbstractController {
             'action' => $id ? 
                 $this->generateUrl('admin_product_update', ['id'=> $id]) :
                 $this->generateUrl('admin_product_create'),
-                // Этих двух рутов выше пока что не существует. 
             'method' => 'POST'
         ]);
 
