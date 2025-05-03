@@ -4,7 +4,7 @@ namespace App\Enum;
 
 enum RentalStatus: string
 {
-    case ACTIVE = 'active';
-    case RETURNED = 'returned';
-    case BOUGHT = 'bought';
+    case ONGOING = "ongoing";
+    case RETURNED = "returned";
+    case PURCHASED = "purchased";
 }

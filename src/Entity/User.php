@@ -37,12 +37,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Rental>
      */
-    #[ORM\OneToMany(targetEntity: Rental::class, mappedBy: 'user_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Rental::class, mappedBy: 'userID')]
     private Collection $rentals;
+
+    /**
+     * @var Collection<int, Purchase>
+     */
+    #[ORM\OneToMany(targetEntity: Purchase::class, mappedBy: 'userID')]
+    private Collection $purchases;
 
     public function __construct()
     {
         $this->rentals = new ArrayCollection();
+        $this->purchases = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -131,7 +138,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->rentals->contains($rental)) {
             $this->rentals->add($rental);
-            $rental->setUserId($this);
+            $rental->setUserID($this);
         }
 
         return $this;
@@ -141,8 +148,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->rentals->removeElement($rental)) {
             // set the owning side to null (unless already changed)
-            if ($rental->getUserId() === $this) {
-                $rental->setUserId(null);
+            if ($rental->getUserID() === $this) {
+                $rental->setUserID(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Purchase>
+     */
+    public function getPurchases(): Collection
+    {
+        return $this->purchases;
+    }
+
+    public function addPurchase(Purchase $purchase): static
+    {
+        if (!$this->purchases->contains($purchase)) {
+            $this->purchases->add($purchase);
+            $purchase->setUserID($this);
+        }
+
+        return $this;
+    }
+
+    public function removePurchase(Purchase $purchase): static
+    {
+        if ($this->purchases->removeElement($purchase)) {
+            // set the owning side to null (unless already changed)
+            if ($purchase->getUserID() === $this) {
+                $purchase->setUserID(null);
             }
         }
 

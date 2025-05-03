@@ -47,15 +47,9 @@ class Product
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $category = null;
 
-    /**
-     * @var Collection<int, Rental>
-     */
-    #[ORM\OneToMany(targetEntity: Rental::class, mappedBy: 'product_id', orphanRemoval: true)]
-    private Collection $rentals;
-
     public function __construct()
     {
-        $this->rentals = new ArrayCollection();
+        
     }
 
     public function getId(): ?int
@@ -179,36 +173,6 @@ class Product
     public function setCategory(?string $category): static
     {
         $this->category = $category;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Rental>
-     */
-    public function getRentals(): Collection
-    {
-        return $this->rentals;
-    }
-
-    public function addRental(Rental $rental): static
-    {
-        if (!$this->rentals->contains($rental)) {
-            $this->rentals->add($rental);
-            $rental->setProductId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRental(Rental $rental): static
-    {
-        if ($this->rentals->removeElement($rental)) {
-            // set the owning side to null (unless already changed)
-            if ($rental->getProductId() === $this) {
-                $rental->setProductId(null);
-            }
-        }
 
         return $this;
     }

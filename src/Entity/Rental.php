@@ -4,9 +4,6 @@ namespace App\Entity;
 
 use App\Enum\RentalStatus;
 use App\Repository\RentalRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RentalRepository::class)]
@@ -19,87 +16,101 @@ class Rental
 
     #[ORM\ManyToOne(inversedBy: 'rentals')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Product $product_id = null;
+    private ?User $userID = null;
 
-    #[ORM\ManyToOne(inversedBy: 'rentals')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user_id = null;
+    private ?Product $productID = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $start_date = null;
+    #[ORM\Column]
+    private ?\DateTime $startTimestamp = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $end_date = null;
+    #[ORM\Column]
+    private ?\DateTime $endTimestamp = null;
+
+    #[ORM\Column]
+    private ?float $amount = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $buyoutCost = null;
 
     #[ORM\Column(enumType: RentalStatus::class)]
     private ?RentalStatus $status = null;
 
-    #[ORM\Column]
-    private ?float $calculated_price = null;
-
-    #[ORM\Column]
-    private ?float $buyout_price = null;
-
-    /**
-     * @var Collection<int, Transaction>
-     */
-    #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'rental_id')]
-    private Collection $transactions;
-
-    public function __construct()
-    {
-        $this->transactions = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getProductId(): ?Product
+    public function getUserID(): ?User
     {
-        return $this->product_id;
+        return $this->userID;
     }
 
-    public function setProductId(?Product $product_id): static
+    public function setUserID(?User $userID): static
     {
-        $this->product_id = $product_id;
+        $this->userID = $userID;
 
         return $this;
     }
 
-    public function getUserId(): ?User
+    public function getProductID(): ?Product
     {
-        return $this->user_id;
+        return $this->productID;
     }
 
-    public function setUserId(?User $user_id): static
+    public function setProductID(?Product $productID): static
     {
-        $this->user_id = $user_id;
+        $this->productID = $productID;
 
         return $this;
     }
 
-    public function getStartDate(): ?\DateTimeInterface
+    public function getStartTimestamp(): ?\DateTime
     {
-        return $this->start_date;
+        return $this->startTimestamp;
     }
 
-    public function setStartDate(\DateTimeInterface $start_date): static
+    public function setStartTimestamp(\DateTime $startTimestamp): static
     {
-        $this->start_date = $start_date;
+        $this->startTimestamp = $startTimestamp;
 
         return $this;
     }
 
-    public function getEndDate(): ?\DateTimeInterface
+    public function getEndTimestamp(): ?\DateTime
     {
-        return $this->end_date;
+        return $this->endTimestamp;
     }
 
-    public function setEndDate(\DateTimeInterface $end_date): static
+    public function setEndTimestamp(\DateTime $endTimestamp): static
     {
-        $this->end_date = $end_date;
+        $this->endTimestamp = $endTimestamp;
+
+        return $this;
+    }
+
+    public function getAmount(): ?float
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(float $amount): static
+    {
+        $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getBuyoutCost(): ?float
+    {
+        return $this->buyoutCost;
+    }
+
+    public function setBuyoutCost(?float $buyoutCost): static
+    {
+        $this->buyoutCost = $buyoutCost;
 
         return $this;
     }
@@ -116,57 +127,4 @@ class Rental
         return $this;
     }
 
-    public function getCalculatedPrice(): ?float
-    {
-        return $this->calculated_price;
-    }
-
-    public function setCalculatedPrice(float $calculated_price): static
-    {
-        $this->calculated_price = $calculated_price;
-
-        return $this;
-    }
-
-    public function getBuyoutPrice(): ?float
-    {
-        return $this->buyout_price;
-    }
-
-    public function setBuyoutPrice(float $buyout_price): static
-    {
-        $this->buyout_price = $buyout_price;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Transaction>
-     */
-    public function getTransactions(): Collection
-    {
-        return $this->transactions;
-    }
-
-    public function addTransaction(Transaction $transaction): static
-    {
-        if (!$this->transactions->contains($transaction)) {
-            $this->transactions->add($transaction);
-            $transaction->setRentalId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTransaction(Transaction $transaction): static
-    {
-        if ($this->transactions->removeElement($transaction)) {
-            // set the owning side to null (unless already changed)
-            if ($transaction->getRentalId() === $this) {
-                $transaction->setRentalId(null);
-            }
-        }
-
-        return $this;
-    }
 }
