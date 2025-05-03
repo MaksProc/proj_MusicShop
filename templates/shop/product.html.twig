@@ -1,0 +1,32 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Product Image -->
+        <div class="col-md-6 text-center mb-4 mb-md-0">
+            {# Images not yet implemented #}
+            {% if product.imagePath %}
+            <img src="{{ asset(product.imagePath) }}" alt="{{ product.name }}" class="img-fluid rounded shadow">
+            {% endif %}
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-md-6 d-flex flex-column justify-content-center">
+            <h2 class="mb-3">{{ product.name }}</h2>
+            <p class="text-muted">{{ product.description }}</p>
+
+            <div class="mt-4">
+                {% if product.type.value == "both" %}
+                    <button class="btn btn-primary me-2">Buy</button>
+                    <button class="btn btn-outline-secondary">Rent</button>
+                {% elseif product.type.value == "buy" %}
+                    <button class="btn btn-primary">Buy</button>
+                {% elseif product.type.value == "rent" %}
+                    <button class="btn btn-outline-secondary">Rent</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

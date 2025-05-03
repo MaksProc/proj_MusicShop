@@ -25,4 +25,13 @@ class ShopController extends AbstractController
             'search' => $searchTerm
         ]);
     }
+
+    #[Route(path: '/product/{id}', name: 'shop_product_show')]
+    public function showProduct(ProductRepository $repo, Request $request, int $id): Response
+    {
+        $product = $repo->find($id);
+        return $this->render('shop/product.html.twig', [
+            'product'=> $product
+        ]);
+    }
 }
