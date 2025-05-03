@@ -13,7 +13,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Flex\Response as FlexResponse;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+
 
 #[IsGranted('ROLE_ADMIN')]
 class AdminController extends AbstractController {
@@ -43,6 +50,8 @@ class AdminController extends AbstractController {
         return $this->redirectToRoute('admin_dashboard');
     }
 
+
+
     #[Route(path: '/admin/product-form/{id}', name: 'admin_product_form', defaults: ['id' => null])]
     public function productForm(?int $id, ProductRepository $repo, Request $request): Response
     {
@@ -63,8 +72,17 @@ class AdminController extends AbstractController {
         ]);
     }
 
+
+
     #[Route(path:'/admin/product/{id}/update', name:'admin_product_update', methods: ['POST'])]
-    public function update(int $id, EntityManagerInterface $em, Request $request, ProductRepository $repo): Response
+    public function update(
+        int $id, 
+        EntityManagerInterface $em, 
+        Request $request, 
+        ProductRepository $repo,
+        SluggerInterface $slugger,
+        Filesystem $filesystem
+        ): Response
     {
         $product = $repo->find($id);
         if (!$product) {
@@ -75,6 +93,35 @@ class AdminController extends AbstractController {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile|null $imageFile */
+            $imageFile = $form->get('imageFile')->getData();
+
+            if ($imageFile) {
+                // 1. Usuń stary plik, jeśli istnieje
+                $oldImagePath = $this->getParameter('product_images_directory') . '/' . $product->getImagePath();
+                if ($product->getImagePath() && $filesystem->exists($oldImagePath)) {
+                    $filesystem->remove($oldImagePath);
+                }
+
+                // 2. Zapisz nowy plik
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                try {
+                    $imageFile->move(
+                        $this->getParameter('product_images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Nie udało się przesłać obrazu.');
+                    return $this->redirectToRoute('admin_dashboard');
+                }
+
+                // 3. Zapisz ścieżkę do nowego pliku
+                $product->setImagePath($newFilename);
+            }
+
             $em->flush();
 
             $this->addFlash('success','Product updated');
@@ -86,14 +133,36 @@ class AdminController extends AbstractController {
         ]);
     }
 
+
+
     #[Route(path:'/admin/product/create', name:'admin_product_create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em): Response
+    public function create(Request $request, EntityManagerInterface $em, SluggerInterface $slugger,): Response
     {
         $product = new Product();
         $form = $this->createForm(AddProductForm::class, $product);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('imageFile')->getData();
+
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+
+                try {
+                    $imageFile->move(
+                        $this->getParameter('product_images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // tu miałby być jakiś error message dla formularza?
+                }
+
+                $product->setImagePath('uploads/products/' . $newFilename);
+            }
+
+
             $em->persist($product);
             $em->flush();
 

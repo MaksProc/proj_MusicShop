@@ -1,6 +1,46 @@
-<h4>{{ form.vars.value.id ? 'Edit Product' : 'Add New Product' }}</h4>
+<h4 class="mb-4">
+  {{ form.vars.value.id ? 'Edit Product' : 'Add New Product' }}
+</h4>
 
-{{ form_start(form) }}
-  {{ form_widget(form) }}
-  <button class="btn btn-success mt-3">Save</button>
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+<div class="row">
+  <div class="col-md-6">
+    {% for field in [form.name, form.description, form.type, form.base_price, form.base_rent_per_day, form.base_rent_per_week, form.stock, form.availability, form.category] %}
+      <div class="mb-3">
+        {{ form_label(field, null, {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(field) }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="col-md-6">
+    <div class="mb-3">
+      {{ form_label(form.imageFile, 'Product Image', {'label_attr': {'class': 'form-label'}}) }}
+      
+      <div 
+        class="form-control border border-secondary p-4 text-center"
+        ondragover="event.preventDefault()"
+        ondrop="document.getElementById('{{ form.imageFile.vars.id }}').files = event.dataTransfer.files"
+        style="cursor: pointer;"
+        onclick="document.getElementById('{{ form.imageFile.vars.id }}').click()"
+      >
+        <div>
+          <i class="bi bi-upload" style="font-size: 2rem;"></i><br>
+          Drag & drop an image here or click to select
+        </div>
+      </div>
+      
+      <div style="display: none;">
+        {{ form_widget(form.imageFile) }}
+      </div>
+      
+      {{ form_errors(form.imageFile) }}
+    </div>
+  </div>
+</div>
+
+<button class="btn btn-success mt-3">Save</button>
+
 {{ form_end(form) }}
