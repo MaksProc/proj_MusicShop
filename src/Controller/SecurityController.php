@@ -30,11 +30,13 @@ class SecurityController extends AbstractController
         ]);
     }
 
+
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
+
 
     #[Route(path: '/register', name: 'app_register')]
     public function register(
@@ -64,7 +66,7 @@ class SecurityController extends AbstractController
             $em->flush();
 
             $this->addFlash('success','Product created');
-            return $this->redirectToRoute('shop_home');
+            return $this->redirectToRoute('app_login');
         }   
 
         return $this->render('security/register.html.twig', [

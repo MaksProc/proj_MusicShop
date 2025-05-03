@@ -2,6 +2,7 @@
 
 {% block stylesheets %}
 <link rel="stylesheet" href="{{ asset('css/searchbar.css') }}">
+<link rel="stylesheet" href="{{ asset('css/price-range-slider.css') }}"
 {% endblock %}
 
 {% block body %}
@@ -16,9 +17,36 @@
       <!-- Left column: filters -->
       <div class="col-md-3">
         <form method="get">
+          
+
           <label>Price range</label>
-          <input type="number" name="min_price" class="form-control mb-2" placeholder="Min">
-          <input type="number" name="max_price" class="form-control mb-2" placeholder="Max">
+          <div class="double-slider-box">
+            {# <h3 class="range-title">Price Range Slider</h3> #}
+            <div class="range-slider">
+              <span class="slider-track"></span>
+              <input type="range" name="min_price" class="min-val" min="1000" max="12000" value="2000">
+              <input type="range" name="max_price" class="max-val" min="1000" max="12000" value="7000">
+              <div class="tooltip min-tooltip" id="price-min-tooltip"></div>
+              <div class="tooltip max-tooltip" id="price-max-tooltip"></div>
+            </div>
+              <div class="input-box">
+                <div class="min-box">
+                  <div class="input-wrap">
+                    <span class="input-addon">$</span>
+                    <input type="text" class="input-field min-input">
+                  </div>
+                </div>
+                <div class="max-box">
+                  <div class="input-wrap">
+                    <span class="input-addon">$</span>
+                    <input type="text" class="input-field max-input">
+                  </div>
+                </div>
+            </div>
+          </div>
+          
+          {# <input type="number" name="min_price" class="form-control mb-2" placeholder="Min">
+          <input type="number" name="max_price" class="form-control mb-2" placeholder="Max"> #}
 
           <label>Type</label>
           <select name="type" class="form-select mb-3">
@@ -54,5 +82,7 @@
         </div>
       </div>
     </div>
+    {# // <script src="public\js\price-range-slider.js"></script> #}
   </div>
+  <script src="{{ asset('js/price-range-slider.js') }}"></script>
 {% endblock %}
