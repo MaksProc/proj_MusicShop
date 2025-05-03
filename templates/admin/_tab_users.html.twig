@@ -1,0 +1,50 @@
+<div class="container">
+    <h1>Manage users</h1>
+  
+    <form method="get" class="mb-4 position-relative">
+      <input type="text" name="u" value="{{ u|default('') }}" placeholder="Wyszukaj..." class="form-control" />
+      <button type="submit" class="btn btn-search"><i class="fas fa-search search-icon"></i></button>
+      
+    </form>
+
+    {# <button class="btn btn-primary mb-3" id="add-user-btn">Add New User</button> #}
+  
+    <!-- User Table -->
+    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+      <table class="table table-hover" id="user-table">
+        <thead>
+          <tr>
+            <th>E-mail</th>
+            <th>Roles</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            <tr class="user-row"
+                data-id="{{ user.id }}"
+                data-email="{{ user.email }}"
+                {% if 'ROLE_ADMIN' in user.roles %}
+                    data-roles="Administrator"
+                    {% else %}
+                    data-roles="User"
+                {% endif %}
+            >
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if 'ROLE_ADMIN' in user.roles %}
+                    Administrator
+                    {% else %}
+                    User
+                    {% endif %}
+                </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- Dynamic Form Area -->
+    <div id="user-form-container" class="mt-4"></div>
+    </div>
+  
+  <script src="{{ asset('js/admin_dashboard_users.js') }}"></script>

@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Form\AddProductForm;
+use App\Form\UserRoleChangeFormTypeForm;
 use App\Repository\ProductRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Dom\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,16 +28,22 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class AdminController extends AbstractController {
 
     #[Route('/admin', name: 'admin_dashboard')]
-    public function dashboard(ProductRepository $productRepo, Request $request): Response
+    public function dashboard(ProductRepository $productRepo, Request $request, UserRepository $userRepo): Response
     {   
+        // "p" dla Products; Inne wkładki mają własne wyszukiwarki
         $searchTermProduct = $request->query->get("p");
-        // "p" is for products tab; other tabs might also have searchbars, they will use different keywords
         $products = $searchTermProduct
             ? $productRepo->findByNameLike($searchTermProduct)
             : $productRepo->findAll();
+
+
+        $users = $userRepo->findAll();
+
         return $this->render('admin/dashboard.html.twig', [
             'products' => $products,
-            'p' => $searchTermProduct
+            'p' => $searchTermProduct,
+            'users' => $users,
+            'u' => ''
         ]);
     }
 
@@ -57,8 +65,8 @@ class AdminController extends AbstractController {
     {
         $product = $id ? $repo->find($id) : new Product();
 
-        // I am using the same form for creating and updating products from dashboard.
-        // Note to self: refactor AddProductForm to reflect this
+        // Używam ten sam formularz dla tworzenia nowych produktów i zmiany starych.
+        // Zapis dla siebie: zmień nazwę AddProductForm aby odpowiadała temu przeznaczeniu
 
         $form = $this->createForm(AddProductForm::class, $product, [
             'action' => $id ? 
@@ -172,6 +180,48 @@ class AdminController extends AbstractController {
 
         return $this->render('admin/_product_form.html.twig', [
             'form' => $form->createView()
+        ]);
+    }
+
+
+    #[Route(path: '/admin/user/role-form/{id}', name:'admin_user_role_form')]
+    public function userForm(int $id, UserRepository $repo) {
+        $user = $repo->find($id);
+
+        $form = $this->createForm(UserRoleChangeFormTypeForm::class, $user, [
+            'action' => 
+                $this->generateUrl('admin_user_role_update', ['id'=> $id]),
+            'method' => 'POST'
+        ]);
+
+        return $this->render('admin/_user_form.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+
+    #[Route(path:'/admin/user/updateRole/{id}', name:'admin_user_role_update', methods: ['POST'])]
+    public function userRoleUpdate(
+        int $id, 
+        UserRepository $repo, 
+        Request $request,
+        EntityManagerInterface $em): Response
+    {
+        $user = $repo->find($id);
+        $form = $this->createForm(UserRoleChangeFormTypeForm::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+
+            // Add check so admin can't demote themselves
+
+            $this->addFlash('success','User role updated');
+            return $this->redirectToRoute('admin_dashboard');
+        }
+
+        return $this->render('admin/_user_form.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 }
