@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\SecurityBundle\Security;
 
 
 
@@ -215,16 +216,22 @@ class AdminController extends AbstractController {
         int $id, 
         UserRepository $repo, 
         Request $request,
-        EntityManagerInterface $em): Response
+        EntityManagerInterface $em,
+        Security $security): Response
     {
         $user = $repo->find($id);
         $form = $this->createForm(UserRoleChangeFormTypeForm::class, $user);
         $form->handleRequest($request);
+        $currentUser = $security->getUser();
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush();
+            
+            if ($currentUser && $currentUser->getId() === $user->getId()) {
+                $this->addFlash('error','You cannot change your own roles.');
+                return $this->redirectToRoute('admin_dashboard');
+            }
 
-            // Add check so admin can't demote themselves
+            $em->flush();
 
             $this->addFlash('success','User role updated');
             return $this->redirectToRoute('admin_dashboard');
