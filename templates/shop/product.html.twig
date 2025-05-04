@@ -17,13 +17,17 @@
             <p class="text-muted">{{ product.description }}</p>
 
             <div class="mt-4">
-                {% if product.type.value == "both" %}
+                {% if app.user %}
+                    {% if product.type.value == "both" %}
                     <a class="btn btn-primary me-2" id="btn-purchase" data-productid="{{ product.id }}">Buy</a>
                     <a class="btn btn-outline-secondary" id="btn-rent" data-productid="{{ product.id }}">Rent</a>
-                {% elseif product.type.value == "buy" %}
+                    {% elseif product.type.value == "buy" %}
                     <a class="btn btn-primary" id="btn-purchase" data-productid="{{ product.id }}">Buy</a>
-                {% elseif product.type.value == "rent" %}
+                    {% elseif product.type.value == "rent" %}
                     <a class="btn btn-outline-secondary" id="btn-rent" data-productid="{{ product.id }}">Rent</a>
+                    {% endif %}
+                {% else %}
+                    <p>Zaloguj się, aby kupić lub wypożyczyć ten produkt</p>
                 {% endif %}
             </div>
         </div>

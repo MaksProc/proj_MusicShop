@@ -12,8 +12,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\MakePurchaseForm;
 use App\Form\MakeRentalForm;
+use App\Repository\PurchaseRepository;
+use App\Repository\RentalRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ShopController extends AbstractController
 {
@@ -40,6 +44,7 @@ class ShopController extends AbstractController
             'product'=> $product
         ]);
     }
+
 
     #[Route(path:'/product/{stringID}/purchase-form', name:'shop_purchase_form')]
     public function purchaseForm(
@@ -158,4 +163,60 @@ class ShopController extends AbstractController
             'product' => $product
         ]);
     }
+
+
+    #[IsGranted('ROLE_USER')]
+    #[Route(path: '/account/myOrders', name:'shop_my_orders')]
+    public function renderCurrentUserOrders(
+        Security $security,
+        RentalRepository $rentalRepo,
+        PurchaseRepository $purchaseRepo
+    ): Response
+    {
+        $user = $security->getUser();
+        $rentalOrders = $rentalRepo->findBy(['userID' => $user]);
+        $purchaseOrders = $purchaseRepo->findBy(['userID'=> $user]);
+
+        return $this->render('shop/my_orders.html.twig', [
+            'rentals' => $rentalOrders,
+            'purchases' => $purchaseOrders
+        ]);
+    }
+
+
+    #[Route(path:'/product/{id}/name', name:'get_product_name')]
+    public function getProductName(
+        ProductRepository $repo,
+        int $id
+    ): Response {
+        $product = $repo->find($id);
+        return new Response($product->getName());
+    }
+
+    #[Route('/rental/{id}/extend', name: 'rental_extend', methods: ['POST'])]
+    public function extendRental(
+        int $id,
+        Request $request,
+        RentalRepository $repo,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $rental = $repo->find($id);
+        $data = json_decode($request->getContent(), true);
+
+        $newEndDate = new \DateTime($data['new_end_date'] ?? '');
+        if ($newEndDate <= $rental->getEndTimestamp()) {
+            return new JsonResponse(['error' => 'Data musi być póżniejsza'], 400);
+        }
+
+        $rental->setEndTimestamp($newEndDate);
+
+        $days = $rental->getStartTimestamp()->diff($newEndDate)->days;
+        $rate = $rental->getProductID()->getBaseRentPerDay();
+        $rental->setAmount($days * $rate);
+
+        $em->flush();
+
+        return new JsonResponse(['status' => 'ok']);
+    }
+
 }
