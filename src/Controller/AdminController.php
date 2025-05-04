@@ -7,6 +7,9 @@ use App\Form\AddProductForm;
 use App\Form\UserRoleChangeFormTypeForm;
 use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
+use App\Repository\RentalRepository;
+use App\Enum\RentalStatus;
+use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\ORM\EntityManagerInterface;
 use Dom\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,6 +24,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 
@@ -28,7 +32,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class AdminController extends AbstractController {
 
     #[Route('/admin', name: 'admin_dashboard')]
-    public function dashboard(ProductRepository $productRepo, Request $request, UserRepository $userRepo): Response
+    public function dashboard(
+        Request $request, 
+        ProductRepository $productRepo, 
+        UserRepository $userRepo,
+        RentalRepository $rentalRepo, ): Response
     {   
         // "p" dla Products; Inne wkładki mają własne wyszukiwarki
         $searchTermProduct = $request->query->get("p");
@@ -38,12 +46,14 @@ class AdminController extends AbstractController {
 
 
         $users = $userRepo->findAll();
+        $rentals = $rentalRepo->findAll();
 
         return $this->render('admin/dashboard.html.twig', [
             'products' => $products,
             'p' => $searchTermProduct,
             'users' => $users,
-            'u' => ''
+            'u' => '',
+            'rentals' => $rentals,
         ]);
     }
 
@@ -224,4 +234,30 @@ class AdminController extends AbstractController {
             'form' => $form->createView(),
         ]);
     }
+
+
+    #[Route('/admin/rental/{id}/change-status', name: 'admin_rental_status_change', methods: ['POST'])]
+    public function changeStatus(
+        int $id,
+        Request $request,
+        RentalRepository $rentalRepo,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $rental = $rentalRepo->find($id);
+        $data = json_decode($request->getContent(), true);
+
+        if (!$rental || $rental->getStatus() !== RentalStatus::ONGOING) {
+            return new JsonResponse(['error' => 'Invalid rental'], 400);
+        }
+
+        try {
+            $rental->setStatus(RentalStatus::from($data['new_status']));
+            $em->flush();
+        } catch (\ValueError $e) {
+            return new JsonResponse(['error' => 'Invalid status'], 400);
+        }
+
+        return new JsonResponse(['status' => 'ok']);
+    }
+
 }

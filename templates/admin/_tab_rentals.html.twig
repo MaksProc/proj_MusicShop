@@ -1,0 +1,49 @@
+<div class="container">
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="rentals-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Product</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rental in rentals %}
+                    <tr class="rental-row" data-rental-id="{{ rental.id }}">
+                        <td>{{ rental.userID.email }}</td>
+                        <td>{{ rental.productID.name }}</td>
+                        <td>{{ rental.startTimestamp|date('Y-m-d') }}</td>
+                        <td>{{ rental.endTimestamp|date('Y-m-d') }}</td>
+                        <td>
+                            {{ rental.status.value }}
+                            {% if rental.status == constant('App\\Enum\\RentalStatus::ONGOING') %}
+                                <button class="btn btn-sm btn-outline-primary ms-2 change-status-btn">
+                                    Change
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr class="extend-form-row d-none" id="extend-form-{{ rental.id }}">
+                        <td colspan="5">
+                            <form class="change-status-form d-flex align-items-center gap-2" data-rental-id="{{ rental.id }}">
+                                <label class="form-label m-0">Set status:</label>
+                                <select name="new_status" class="form-select form-select-sm" required>
+                                    <option value="returned">Returned</option>
+                                    <option value="purchased">Purchased</option>
+                                </select>
+                                <button class="btn btn-sm btn-success">Confirm</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="5">No rentals found.</td></tr>
+                {% endfor %}
+            </tbody>            
+        </table>
+    </div>
+<script src="{{ asset('js/admin_dashboard_rentals.js') }}"></script>
+</div>
