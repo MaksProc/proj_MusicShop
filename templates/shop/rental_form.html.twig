@@ -1,0 +1,6 @@
+<h5>Purchase {{ product.name }}</h5>
+
+{{ form_start(form, { action: path('shop_rental_submit', { id: product.id }) }) }}
+    {{ form_widget(form) }}
+    <button class="btn btn-success mt-3">Confirm Rent</button>
+{{ form_end(form) }}

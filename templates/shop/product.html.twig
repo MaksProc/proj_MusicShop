@@ -18,15 +18,19 @@
 
             <div class="mt-4">
                 {% if product.type.value == "both" %}
-                    <button class="btn btn-primary me-2">Buy</button>
-                    <button class="btn btn-outline-secondary">Rent</button>
+                    <a class="btn btn-primary me-2" id="btn-purchase" data-productid="{{ product.id }}">Buy</a>
+                    <a class="btn btn-outline-secondary" id="btn-rent" data-productid="{{ product.id }}">Rent</a>
                 {% elseif product.type.value == "buy" %}
-                    <button class="btn btn-primary">Buy</button>
+                    <a class="btn btn-primary" id="btn-purchase" data-productid="{{ product.id }}">Buy</a>
                 {% elseif product.type.value == "rent" %}
-                    <button class="btn btn-outline-secondary">Rent</button>
+                    <a class="btn btn-outline-secondary" id="btn-rent" data-productid="{{ product.id }}">Rent</a>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
+<div class="transaction-form-container">
+
+</div>
+<script src="{{ asset('js/shop_product_page.js') }}"></script>
 {% endblock %}
