@@ -80,6 +80,11 @@ class ShopController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($purchase->getQuantity() > $product->getStock()) {
+                return $this->redirectToRoute('shop_product_show', ['id'=> $id]);
+            }
+
+
             $purchase->setUserID($security->getUser());
             $purchase->setProductID($product);
             $purchase->setTimestamp(new \DateTime());
@@ -89,6 +94,8 @@ class ShopController extends AbstractController
 
             $em->persist($purchase);
             $em->flush();
+
+            $product->setStock($product->getStock() - $purchase->getQuantity());
 
             $this->addFlash('success', 'Purchase complete!');
             return $this->redirectToRoute('shop_home');
@@ -141,9 +148,13 @@ class ShopController extends AbstractController
 
             $interval = $rental->getStartTimestamp()->diff($rental->getEndTimestamp());
             $days = (int) $interval->format('%a'); //Całkowita liczba dni
-            $rental->setAmount($days * $product->getBaseRentPerDay());
 
-            //  Sprawdź, aby $diff nie był ujemny
+            // Koniec musi być nie wcześniej od początku
+            if ($days <= 0) {
+                return $this->redirectToRoute('shop_product_show', ['id'=> $id]);
+            }
+
+            $rental->setAmount($days * $product->getBaseRentPerDay());
 
             $rental->setBuyoutCost( $rental->getAmount() > $product->getBasePrice()/2 ?
                 $product->getBasePrice() /2 :
@@ -153,6 +164,8 @@ class ShopController extends AbstractController
 
             $em->persist($rental);
             $em->flush();
+
+            $product->setStock($product->getStock() - 1);
 
             $this->addFlash('success', 'Rent started!');
             return $this->redirectToRoute('shop_home');
