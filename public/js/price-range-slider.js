@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const maxTooltip = document.querySelector(".max-tooltip");
   const range = document.querySelector(".slider-track");
   
-  const minGap = 1500;
+  const minGap = 30;
   const minLimit = parseInt(minVal.min);
   const maxLimit = parseInt(maxVal.max);
 
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     priceInputMin.value = min;
     priceInputMax.value = max;
-
+    
     const percentMin = ((min - minLimit) / (maxLimit - minLimit)) * 100;
     const percentMax = ((max - minLimit) / (maxLimit - minLimit)) * 100;
 

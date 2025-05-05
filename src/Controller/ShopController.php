@@ -26,13 +26,18 @@ class ShopController extends AbstractController
     public function index(ProductRepository $productRepo, Request $request): Response
     {
         $searchTerm = $request->query->get("search");
-        $products = $searchTerm
-            ? $productRepo->findByNameLike($searchTerm)
-            : $productRepo->findAll();
+        $minPrice = $request->query->get("min_price");
+        $maxPrice = $request->query->get("max_price");
+        $type = $request->query->get("type");
+
+        $products = $productRepo->filterProducts($searchTerm, $minPrice, $maxPrice, $type);
 
         return $this->render('shop/index.html.twig', [
             'products' => $products,
-            'search' => $searchTerm
+            'search' => $searchTerm,
+            'minPrice'=> $minPrice,
+            'maxPrice'=> $maxPrice,
+            'type'=> $type
         ]);
     }
 

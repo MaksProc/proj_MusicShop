@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,7 +44,8 @@ class SecurityController extends AbstractController
         Request $request, 
         EntityManagerInterface $em, 
         UserPasswordHasherInterface $userPasswordHasher,
-        Security $security
+        Security $security,
+        UserRepository $userRepository
         ): Response
     {
         if ($security->getUser()) {
@@ -56,6 +58,10 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (!$userRepository->isEmailUnique($user->getEmail())) {
+                $this->addFlash('error', 'Some user by this email already registered');
+                return $this->redirectToRoute('app_register');
+            }
             $hashedPassword = $userPasswordHasher->hashPassword(
                 $user,
                 $user->getPassword()

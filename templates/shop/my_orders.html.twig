@@ -2,26 +2,26 @@
 
 {% block body %}
 <div class="container mt-5">
-  <h2>My Orders</h2>
+  <h2>Moje zamówienia</h2>
 
   <!-- Toggle Buttons -->
   <div class="btn-group mb-3" role="group">
-    <button class="btn btn-outline-primary active" id="btn-rentals">Rentals</button>
-    <button class="btn btn-outline-primary" id="btn-purchases">Purchases</button>
+    <button class="btn btn-outline-primary active" id="btn-rentals">Wypożyczenia</button>
+    <button class="btn btn-outline-primary" id="btn-purchases">Zakupy</button>
   </div>
 
   <!-- Rentals Table -->
   <div id="rentals-section" class="fade show">
-    <h4>Your Rentals</h4>
+    <h4>Moje wypożyczenia</h4>
     <div class="table-responsive">
       <table class="table table-striped">
         <thead>
           <tr>
-            <th>Product</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Amount</th>
-            <th>Buyout</th>
+            <th>Produkt</th>
+            <th>Początek</th>
+            <th>Koniec</th>
+            <th>Koszt</th>
+            <th>Koszt wykupu</th>
           </tr>
         </thead>
         <tbody>
@@ -31,22 +31,26 @@
               <td>{{ rental.startTimestamp|date('Y-m-d') }}</td>
               <td>
                 {{ rental.endTimestamp|date('Y-m-d') }}
+                {% if rental.status.value == "ongoing" %}
                 <button class="btn btn-sm btn-secondary extend-btn" data-rental-id="{{ rental.id }}">Wydłuż</button>
+                {% endif %}
               </td>
               <td>{{ rental.amount }}</td>
               <td>{{ rental.buyoutCost }}</td>
             </tr>
+            {% if rental.status.value == "ongoing" %}
             <tr class="extend-form-row d-none" id="extend-form-{{ rental.id }}">
                 <td colspan="5">
                   <form class="extend-form d-flex align-items-center gap-2" data-rental-id="{{ rental.id }}">
-                    <label class="form-label m-0">New end date:</label>
+                    <label class="form-label m-0">Nowa data końca:</label>
                     <input type="date" name="new_end_date" class="form-control" required>
-                    <button class="btn btn-sm btn-primary">Confirm</button>
+                    <button class="btn btn-sm btn-primary">Zatwierdź</button>
                   </form>
                 </td>
               </tr>
+            {% endif %}
           {% else %}
-            <tr><td colspan="5">No rentals found.</td></tr>
+            <tr><td colspan="5">Nie znaleziono wypożyczceń.</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -55,15 +59,15 @@
 
   <!-- Purchases Table -->
   <div id="purchases-section" class="fade d-none">
-    <h4>Your Purchases</h4>
+    <h4>Moje zakupy</h4>
     <div class="table-responsive">
       <table class="table table-striped">
         <thead>
           <tr>
-            <th>Product</th>
-            <th>Date</th>
-            <th>Amount</th>
-            <th>Quantity</th>
+            <th>Produkt</th>
+            <th>Data</th>
+            <th>Koszt</th>
+            <th>Liczba</th>
           </tr>
         </thead>
         <tbody>
@@ -75,7 +79,7 @@
               <td>{{ purchase.quantity }}</td>
             </tr>
           {% else %}
-            <tr><td colspan="4">No purchases found.</td></tr>
+            <tr><td colspan="4">Nie znaleziono zakupów.</td></tr>
           {% endfor %}
         </tbody>
       </table>

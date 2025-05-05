@@ -4,10 +4,10 @@
         <table class="table table-hover" id="rentals-table">
             <thead>
                 <tr>
-                    <th>User</th>
-                    <th>Product</th>
-                    <th>Start</th>
-                    <th>End</th>
+                    <th>Użytkownik</th>
+                    <th>Produkt</th>
+                    <th>Początek</th>
+                    <th>Koniec</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -22,7 +22,7 @@
                             {{ rental.status.value }}
                             {% if rental.status == constant('App\\Enum\\RentalStatus::ONGOING') %}
                                 <button class="btn btn-sm btn-outline-primary ms-2 change-status-btn">
-                                    Change
+                                    Zmień
                                 </button>
                             {% endif %}
                         </td>
@@ -30,17 +30,17 @@
                     <tr class="extend-form-row d-none" id="extend-form-{{ rental.id }}">
                         <td colspan="5">
                             <form class="change-status-form d-flex align-items-center gap-2" data-rental-id="{{ rental.id }}">
-                                <label class="form-label m-0">Set status:</label>
+                                <label class="form-label m-0">Zmień na:</label>
                                 <select name="new_status" class="form-select form-select-sm" required>
-                                    <option value="returned">Returned</option>
-                                    <option value="purchased">Purchased</option>
+                                    <option value="returned">Zwrócono</option>
+                                    <option value="purchased">Zakupiono</option>
                                 </select>
-                                <button class="btn btn-sm btn-success">Confirm</button>
+                                <button class="btn btn-sm btn-success">Zatwierdź</button>
                             </form>
                         </td>
                     </tr>
                 {% else %}
-                    <tr><td colspan="5">No rentals found.</td></tr>
+                    <tr><td colspan="5">Nie znaleziono wypożyczeń.</td></tr>
                 {% endfor %}
             </tbody>            
         </table>

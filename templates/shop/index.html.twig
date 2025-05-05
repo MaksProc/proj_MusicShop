@@ -10,7 +10,7 @@
     <form method="get" class="mb-4 position-relative">
       <input type="text" name="search" value="{{ search|default('') }}" placeholder="Wyszukaj..." class="form-control" />
       <button type="submit" class="btn btn-search"><i class="fas fa-search search-icon"></i></button>
-      {# You can pass category ID or name if categories are used later #}
+
     </form>
 
     <div class="row">
@@ -18,43 +18,47 @@
       <div class="col-md-3">
         <form method="get">
           
-
-          <label>Price range</label>
-          <div class="double-slider-box">
-            {# <h3 class="range-title">Price Range Slider</h3> #}
-            <div class="range-slider">
-              <span class="slider-track"></span>
-              <input type="range" name="min_price" class="min-val" min="1000" max="12000" value="2000">
-              <input type="range" name="max_price" class="max-val" min="1000" max="12000" value="7000">
-              <div class="tooltip min-tooltip" id="price-min-tooltip"></div>
-              <div class="tooltip max-tooltip" id="price-max-tooltip"></div>
+          <div class="form-group justify-content-center">
+            <div class="row justify-content-center">
+              <label><strong class="">Zakres cen</strong></label>
             </div>
-              <div class="input-box">
-                <div class="min-box">
+            <div class="double-slider-box">
+              {# <h3 class="range-title">Price Range Slider</h3> #}
+              <div class="range-slider form-group">
+                <span class="slider-track"></span>
+                <input type="range" name="min_price" class="min-val" min="0" max="5000" value="{{ minPrice|default('0') }}">
+                <input type="range" name="max_price" class="max-val" min="30" max="5000" value="{{ maxPrice|default('5000') }}">
+                <div class="tooltip min-tooltip" id="price-min-tooltip"></div>
+                <div class="tooltip max-tooltip" id="price-max-tooltip" style="transform: translateY(-100%)"></div>
+              </div>
+              <div class="input-box flex-wrap">
+                <div class="min-box form-group">
                   <div class="input-wrap">
-                    <span class="input-addon">$</span>
+                    <span class="input-addon">zł</span>
                     <input type="text" class="input-field min-input">
                   </div>
                 </div>
-                <div class="max-box">
+                <div class="max-box form-group">
                   <div class="input-wrap">
-                    <span class="input-addon">$</span>
+                    <span class="input-addon">zł</span>
                     <input type="text" class="input-field max-input">
                   </div>
                 </div>
+              </div>
             </div>
           </div>
-          
+            
+          <div class="form-group">
+            <label>Typ sprzedaży</label>
+            <select name="type" class="form-select mb-3">
+              <option value="" {% if type == "" %} selected {% endif %}>Dowolny</option>
+              <option value="buy" {% if type == "buy" %} selected {% endif %}>Zakup</option>
+              <option value="rent" {% if type == "rent" %} selected {% endif %}>Wypożyczenie</option>
+              <option value="both" {% if type == "both" %} selected {% endif %}>Zakup i wypożyczenie</option>
+            </select>
+            <button class="btn btn-primary">Zastosuj</button>
+          </div>
 
-          <label>Type</label>
-          <select name="type" class="form-select mb-3">
-            <option value="">Any</option>
-            <option value="buy">Buy</option>
-            <option value="rent">Rent</option>
-            <option value="both">Both</option>
-          </select>
-
-          <button class="btn btn-primary">Apply</button>
         </form>
       </div>
 
@@ -67,7 +71,7 @@
                 <div class="card-body">
                   <h5 class="card-title">{{ product.name }}</h5>
                   <p class="card-text">{{ product.description|slice(0, 100) }}...</p>
-                  <p class="text-muted">{{ product.type.value|capitalize }} — {{ product.basePrice }}€</p>
+                  <p class="text-muted">{{ product.type.value|capitalize }} — {{ product.basePrice }} zł</p>
                   <a href="
                   {{ path('shop_product_show', {id: product.id}) }}
                    " class="btn btn-sm btn-outline-primary">View</a>
