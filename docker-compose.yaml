@@ -1,0 +1,33 @@
+# docker-compose.yml
+version: '3.8'
+name: musicshop
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: symfony_app
+    ports:
+      - "8000:8000"  # Symfony dev server
+    volumes:
+      - .:/var/www/symfony
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://symfony:symfony@db:5432/app_db
+
+  db:
+    image: postgres:15
+    container_name: symfony_db
+    environment:
+      POSTGRES_USER: symfony
+      POSTGRES_PASSWORD: symfony
+      POSTGRES_DB: app_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # ports:    # Wyłączono rerouting, o ile serwis bazodanowy musi się łączyć jedynie z serwisem aplikacji
+    #   - "5432:5432"
+
+volumes:
+  pgdata:
