@@ -5,9 +5,8 @@
     <div class="row">
         <!-- Product Image -->
         <div class="col-md-6 text-center mb-4 mb-md-0">
-            {# Images not yet implemented #}
             {% if product.imagePath %}
-            <img src="/uploads/products/{{ asset(product.imagePath) }}" alt="{{ product.name }}" class="img-fluid rounded shadow">
+            <img src="{{ asset(product.imagePath) }}" alt="{{ product.name }}" class="img-fluid rounded shadow">
             {% endif %}
         </div>
 

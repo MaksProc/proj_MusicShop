@@ -138,7 +138,7 @@ class AdminController extends AbstractController {
                 }
 
                 // 3. Zapisz ścieżkę do nowego pliku
-                $product->setImagePath($newFilename);
+                $product->setImagePath($this->normalizeImagePath($newFilename));
             }
 
             $em->flush();
@@ -178,7 +178,7 @@ class AdminController extends AbstractController {
                     // tu miałby być jakiś error message dla formularza?
                 }
 
-                $product->setImagePath('uploads/products/' . $newFilename);
+                $product->setImagePath($this->normalizeImagePath($newFilename));
             }
 
 
@@ -265,6 +265,13 @@ class AdminController extends AbstractController {
         }
 
         return new JsonResponse(['status' => 'ok']);
+    }
+
+    private function normalizeImagePath(string $filename): string
+    {
+        return str_starts_with($filename, 'uploads/products/')
+            ? $filename
+            : 'uploads/products/' . $filename;
     }
 
 }
