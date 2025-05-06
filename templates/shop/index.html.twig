@@ -2,7 +2,8 @@
 
 {% block stylesheets %}
 <link rel="stylesheet" href="{{ asset('css/searchbar.css') }}">
-<link rel="stylesheet" href="{{ asset('css/price-range-slider.css') }}"
+<link rel="stylesheet" href="{{ asset('css/price-range-slider.css') }}">
+<link rel="stylesheet" href="{{ asset('css/shop_home.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -66,7 +67,7 @@
       <div class="col-md-9">
         <div class="row">
           {% for product in products %}
-            <div class="col-md-4 mb-4">
+            {# <div class="col-md-4 mb-4">
               <div class="card h-100">
                 <div class="card-body">
                   <h5 class="card-title">{{ product.name }}</h5>
@@ -75,6 +76,29 @@
                   <a href="
                   {{ path('shop_product_show', {id: product.id}) }}
                    " class="btn btn-sm btn-outline-primary">View</a>
+                </div>
+              </div>
+            </div> #}
+            <div class="col-md-4 mb-4">
+              <div class="card h-100 shadow-sm border-0 hover-shadow" style="transition: transform 0.2s;">
+                {% if product.imagePath %}
+                <img 
+                  src="{{ asset(product.imagePath) }}" 
+                  class="card-img-top" 
+                  alt="{{ product.name }}"
+                  style="height: 200px; object-fit: cover;"
+                  {# onerror="""this.src="{{ asset('img/placeholder.png') }}" ;""" #}
+                >
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">{{ product.name }}</h5>
+                  <p class="text-muted mb-2">
+                    {{ product.type.value|capitalize }} — {{ product.basePrice }} zł
+                  </p>
+                  <a href="{{ path('shop_product_show', { id: product.id }) }}" 
+                     class="mt-auto btn btn-outline-primary btn-sm w-100">
+                    View
+                  </a>
                 </div>
               </div>
             </div>
