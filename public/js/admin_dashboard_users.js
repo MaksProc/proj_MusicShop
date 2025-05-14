@@ -1,9 +1,12 @@
+// Dashboard's Users table script
+
 document.addEventListener('DOMContentLoaded', () => {
     const table = document.getElementById('user-table');
     const formContainer = document.getElementById('user-form-container');
-    // const addBtn = document.getElementById('add-user-btn');
   
-
+    // Users table in dashboard
+    // Here Event Bubbling is used on table (instead of adding an event listener to each button separately)
+    // Button loads a form for editing user data (role)
     table.addEventListener('click', async (event) => {
       const row = event.target.closest('tr.user-row');
       if (!row) return;
@@ -15,14 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
       formContainer.innerHTML = html;
       scrollToForm();
     });
-  
-    // // Load empty form for adding new user
-    // addBtn.addEventListener('click', async () => {
-    //   const response = await fetch('/admin/product-form');
-    //   const html = await response.text();
-    //   formContainer.innerHTML = html;
-    //   scrollToForm();
-    // });
+
   
     function scrollToForm() {
       formContainer.scrollIntoView({ behavior: 'smooth' });

@@ -1,9 +1,11 @@
+// Dashboard's Products table script
+
 document.addEventListener('DOMContentLoaded', () => {
     const table = document.getElementById('product-table');
     const formContainer = document.getElementById('product-form-container');
     const addBtn = document.getElementById('add-product-btn');
   
-    // Load form for editing a product
+    // Event Bubbling on table -> fetching a form with corresponding ProductID
     table.addEventListener('click', async (event) => {
       const row = event.target.closest('tr.product-row');
       if (!row) return;
@@ -16,7 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
       scrollToForm();
     });
   
-    // Load empty form for adding new product
+
+    // addBtn loads form for addition of a new product, distinguished by lack of ID
     addBtn.addEventListener('click', async () => {
       const response = await fetch('/admin/product-form');
       const html = await response.text();

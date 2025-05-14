@@ -24,7 +24,6 @@
               <label><strong class="">Zakres cen</strong></label>
             </div>
             <div class="double-slider-box">
-              {# <h3 class="range-title">Price Range Slider</h3> #}
               <div class="range-slider form-group">
                 <span class="slider-track"></span>
                 <input type="range" name="min_price" class="min-val" min="0" max="5000" value="{{ minPrice|default('0') }}">
@@ -67,18 +66,6 @@
       <div class="col-md-9">
         <div class="row">
           {% for product in products %}
-            {# <div class="col-md-4 mb-4">
-              <div class="card h-100">
-                <div class="card-body">
-                  <h5 class="card-title">{{ product.name }}</h5>
-                  <p class="card-text">{{ product.description|slice(0, 100) }}...</p>
-                  <p class="text-muted">{{ product.type.value|capitalize }} — {{ product.basePrice }} zł</p>
-                  <a href="
-                  {{ path('shop_product_show', {id: product.id}) }}
-                   " class="btn btn-sm btn-outline-primary">View</a>
-                </div>
-              </div>
-            </div> #}
             <div class="col-md-4 mb-4">
               <div class="card h-100 shadow-sm border-0 hover-shadow" style="transition: transform 0.2s;">
                 {% if product.imagePath %}

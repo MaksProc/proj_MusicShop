@@ -21,7 +21,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ShopController extends AbstractController
 {
-    
+    /**
+     * Renders main page
+     * 
+     * @param ProductRepository $productRepo Product repository for filtering products
+     * @param Request $request
+     * 
+     * @Route("/", name="shop_home")
+     * 
+     * @return Response The rendered index page
+     */
     #[Route(path: "/", name: "shop_home")]
     public function index(ProductRepository $productRepo, Request $request): Response
     {
@@ -41,6 +50,16 @@ class ShopController extends AbstractController
         ]);
     }
 
+    /**
+     * Renders product details page
+     * 
+     * @param ProductRepository $productRepo Product repository for finding product
+     * @param Request $request Request with product ID
+     * 
+     * @Route("/product/{id}", name="shop_product_show")
+     * 
+     * @return Response The rendered product page
+     */
     #[Route(path: '/product/{id}', name: 'shop_product_show')]
     public function showProduct(ProductRepository $repo, Request $request, int $id): Response
     {
@@ -51,6 +70,16 @@ class ShopController extends AbstractController
     }
 
 
+    /**
+     * Displays form for product purchase
+     * 
+     * @param ProductRepository $repo Product repository for finding product
+     * @param string $stringID ID of Product to be bought
+     * 
+     * @Route("/product/{stringID}/purchase-form", name="shop_purchase_form")
+     * 
+     * @return Response Rendered purchase form with Product data
+     */
     #[Route(path:'/product/{stringID}/purchase-form', name:'shop_purchase_form')]
     public function purchaseForm(
         ProductRepository $repo, 
@@ -70,6 +99,19 @@ class ShopController extends AbstractController
     }
 
 
+    /**
+     * Creates Purchase from form data and adds to DB
+     * 
+     * @param int $id ID of Product to be purchased
+     * @param ProductRepository $repo Product repository to find Product
+     * @param Security $security Security to get logged user as buyer
+     * @param Request $request 
+     * @param EntityManagerInterface $em
+     * 
+     * @Route("/product/{id}/purchase-submit", name="shop_purchase_submit", methods=["POST"])
+     * 
+     * @return Response Flash and redirect if purchase successful
+     */
     #[Route('/product/{id}/purchase-submit', name:'shop_purchase_submit', methods: ['POST'])]
     public function submitPurchase(
         ProductRepository $repo,
@@ -113,7 +155,16 @@ class ShopController extends AbstractController
     }
 
 
-
+    /**
+     * Displays form for renting
+     * 
+     * @param string $stringID
+     * @param ProductRepository $repo
+     * 
+     * @Route("/product/{stringID}/rental-form", name="shop_rental_form")
+     * 
+     * @return Response Rendered form with Product data
+     */
     #[Route(path:'/product/{stringID}/rental-form', name:'shop_rental_form')]
     public function rentalForm(
         ProductRepository $repo, 
@@ -132,7 +183,21 @@ class ShopController extends AbstractController
         ]);
     }
 
-
+    /**
+     * Creates Rental from form data and adds to DB
+     * 
+     * Handles date check, calculates buyout cost and rent cost, changes stock, sets status to ongoing.
+     * 
+     * @param int $id ID of Product to be rented
+     * @param ProductRepository $repo Product repository to find Product
+     * @param Security $security Security to get logged user as buyer
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * 
+     * @Route("/product/{id}/rental-submit", name="shop_rental_submit", methods=["POST"])
+     * 
+     * @return Response Flash and redirect if Renting successful
+     */
     #[Route('/product/{id}/rental-submit', name:'shop_rental_submit', methods: ['POST'])]
     public function submitRental(
         ProductRepository $repo,
@@ -152,9 +217,9 @@ class ShopController extends AbstractController
             $rental->setProductID($product);
 
             $interval = $rental->getStartTimestamp()->diff($rental->getEndTimestamp());
-            $days = (int) $interval->format('%a'); //Całkowita liczba dni
+            $days = (int) $interval->format('%a'); //Number of whole days
 
-            // Koniec musi być nie wcześniej od początku
+            // End date must not be before start
             if ($days <= 0) {
                 return $this->redirectToRoute('shop_product_show', ['id'=> $id]);
             }
@@ -182,7 +247,17 @@ class ShopController extends AbstractController
         ]);
     }
 
-
+    /**
+     * Displays current user's basket page
+     * 
+     * @param Security $security Security to get logged user
+     * @param RentalRepository $rentalRepo Rental repository to find user's rentals
+     * @param PurchaseRepository $purchaseRepo Purchase repository to find user's purchases
+     * 
+     * @Route("/account/myOrders", name="shop_my_orders")
+     * 
+     * @return Response Rendered basket (shop/my_orders.html.twig) with user's rentals and purchases data
+     */
     #[IsGranted('ROLE_USER')]
     #[Route(path: '/account/myOrders', name:'shop_my_orders')]
     public function renderCurrentUserOrders(
@@ -202,6 +277,16 @@ class ShopController extends AbstractController
     }
 
 
+    /**
+     * Returns product name
+     * 
+     * @Route("/product/{id}/name", name="get_product_name")
+     * 
+     * @param int $id ID of Product
+     * @param ProductRepository $repo Repository to find Product
+     * 
+     * @return Response Product name
+     */
     #[Route(path:'/product/{id}/name', name:'get_product_name')]
     public function getProductName(
         ProductRepository $repo,
@@ -211,6 +296,20 @@ class ShopController extends AbstractController
         return new Response($product->getName());
     }
 
+    /**
+     * Updates end date on a Rental
+     * 
+     * New end date must be later than the old end date.
+     * 
+     * @param int $id   ID of Rental to be updated
+     * @param RentalRepository $repo    Rental repository to find the Rental
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * 
+     * @Route("/rental/{id}/extend", name="rental_extend", methods=["POST"])
+     * 
+     * @return JsonResponse Error or confirmation JSON
+     */
     #[Route('/rental/{id}/extend', name: 'rental_extend', methods: ['POST'])]
     public function extendRental(
         int $id,

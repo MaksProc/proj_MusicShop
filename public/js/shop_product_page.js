@@ -1,3 +1,6 @@
+// Product page script
+// Rent and purchase buttons both load the respective form
+
 document.addEventListener("DOMContentLoaded", () => {
     const formContainer = document.querySelector(".transaction-form-container");
     const rentButton = document.getElementById("btn-rent");

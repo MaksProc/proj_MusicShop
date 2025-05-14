@@ -1,4 +1,9 @@
+// Dashboard's Rentals table script
+
+
 document.addEventListener('DOMContentLoaded', () => {
+
+  // Clicking an "Extend" button makes form below corresponding row visible
   document.querySelectorAll('.change-status-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.closest('.rental-row').dataset.rentalId;
@@ -7,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Form submission -> Server request with fitting ID
   document.querySelectorAll('.change-status-form').forEach(form => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();

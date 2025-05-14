@@ -1,3 +1,5 @@
+// Script for price range double-slider at index.html.twig
+
 document.addEventListener('DOMContentLoaded', function () {
   const minVal = document.querySelector(".min-val");
   const maxVal = document.querySelector(".max-val");
