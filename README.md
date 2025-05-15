@@ -10,7 +10,7 @@ docker-compose up --build
 Project server should then be available at `localhost:8000` soon after container is created. However, its database will contain no example users or products. You may load the backup example data included in the repository using this command:
 
 ```
-docker exec -i symfony_db psql -U symfony -d app_db < backup.sql
+docker exec -i symfony_db psql -U symfony -d app_db < example_bd_data.sql
 ```
 
 The included admin account's credentials are: `admin@oms.com 123`.
