@@ -1,0 +1,2 @@
+example_bd_data.sql -text
+# GitHub should preserve the file's UTF-8 encoding, or it will lose data (Polish symbols for example) and be unreadable to psql
